@@ -45,10 +45,9 @@ def create_cloud_walker(
     *,
     chart_name: str,
     workspace_name: str,
-    fieldSpecs: Optional[Dict[str, FieldSpec]] = None,
+    field_specs: Optional[Dict[str, FieldSpec]] = None,
 ) -> str:
     """
-    (deprecated)
     Create a pygwalker in kanaries cloud
 
     Args:
@@ -57,22 +56,48 @@ def create_cloud_walker(
     Kargs:
         - chart_name (str): pygwalker chart name in kanaries cloud.
         - workspace_name (str): kanaries workspace name.
-        - fieldSpecs (Dict[str, FieldSpec]): Specifications of some fields. They'll been automatically inferred from `df` if some fields are not specified.
+        - field_specs (Dict[str, FieldSpec]): Specifications of some fields.
+        - They'll been automatically inferred from `df`
+        if some fields are not specified.
 
     Returns:
         str: pygwalker url in kanaries cloud
     """
-    if fieldSpecs is None:
-        fieldSpecs = {}
+    if field_specs is None:
+        field_specs = {}
 
-    data_parser = get_parser(dataset, False, fieldSpecs)
+    data_parser = get_parser(dataset, False, field_specs)
 
-    create_cloud_graphic_walker(
+    return create_cloud_graphic_walker(
         chart_name=chart_name,
         workspace_name=workspace_name,
         dataset_content=data_parser.to_parquet(),
         field_specs=data_parser.raw_fields
     )
+
+
+def render_cloud_walker(workspace_name: str, chart_name: str) -> None:
+    """
+    Render a pygwalker in kanaries cloud
+
+    Args:
+        - chart_name (str): pygwalker chart name in kanaries cloud.
+        - workspace_name (str): kanaries workspace name.
+    """
+    cloud_url = get_cloud_graphic_walker(workspace_name, chart_name)
+
+    iframe_html = f"""
+        <iframe
+            width="100%"
+            height="900px"
+            src="{cloud_url}"
+            frameborder="0"
+            allow="clipboard-read; clipboard-write"
+            allowfullscreen>
+        </iframe>
+    """
+
+    display_html(iframe_html)
 
 
 def walk_on_cloud(workspace_name: str, chart_name: str):
